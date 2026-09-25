@@ -286,5 +286,69 @@ erDiagram
     }
 ```
 
+| Table | Stores |
+| --- | --- |
+| `users` | Accounts with their role level, profile photo and last sign-in time |
+| `user_groups` | Roles (Admin, Special, User) and whether each one is active |
+| `categories` | Product categories |
+| `products` | Stock items with quantity, buying and selling price, category and photo |
+| `media` | Uploaded product photos |
+| `sales` | Recorded sales; each one reduces the product's stock |
+
+> [!IMPORTANT]
+> Foreign keys cascade on delete. Deleting a group deletes every user in it, deleting a category deletes its products, and deleting a product deletes its sales.
+
+## Security Notes
+
+In its current form the application is best suited to local or trusted-network use. It includes these protections:
+
+- Session-based sign-in, with a role check on every protected page
+- User input escaped with `mysqli::real_escape_string` before it reaches SQL, and most output passed through `htmlspecialchars`
+- Uploads limited to image files (`.jpg`, `.jpeg`, `.png`, `.gif`)
+- Passwords stored as SHA-1 hashes rather than plain text
+
+Before deploying it publicly:
+
+1. Change or delete every demo account, and connect with a dedicated MySQL user and a strong password instead of `root`.
+2. Replace SHA-1 password hashing with PHP's `password_hash()` and `password_verify()`.
+3. Switch `includes/database.php` to its production error message and turn off `display_errors` in `php.ini`, so failed queries and error details aren't shown to visitors.
+4. Add CSRF tokens to forms, and turn the delete links (currently `GET` requests) into `POST` forms.
+5. Move database queries to prepared statements.
+6. Serve the application over HTTPS.
+
+## Troubleshooting
+
+| Problem | Solution |
+| --- | --- |
+| `Database connection failed`, or `Uncaught mysqli_sql_exception` on the first page | Start MySQL, then check the credentials in `includes/config.php`. |
+| `Failed to Select Database` or `Unknown database 'inventory_system'` | Create the `inventory_system` database and import the SQL file ([step 4](#installation)). |
+| `Call to undefined function mysqli_connect()` | Enable the `mysqli` extension in `php.ini`, then restart Apache. |
+| Daily sales, Monthly sales or Sales by dates fail with `Error on this Query` or a `GROUP BY` error | MySQL 5.7 and later enable `ONLY_FULL_GROUP_BY` by default, and the report queries need it turned off. See the command below, or use MariaDB. |
+| Blank page after signing in, or `headers already sent` warnings | Turn on `output_buffering` in `php.ini`. XAMPP has it on by default. |
+| Photo upload fails with `... Must be writable!!!.` | Give the web server write access to `uploads/products` and `uploads/users`. |
+| Pages load without styling | Bootstrap and jQuery load from CDNs, so check the browser's internet connection. |
+
+To turn off `ONLY_FULL_GROUP_BY` on MySQL, run this as `root`:
+
+```sql
+-- Lasts until MySQL restarts. To make it permanent, set sql_mode in my.cnf / my.ini.
+SET GLOBAL sql_mode = (SELECT REPLACE(@@GLOBAL.sql_mode, 'ONLY_FULL_GROUP_BY', ''));
+```
+
+## Contributing
+
+Contributions are welcome.
+
+1. Fork the repository.
+2. Create a branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m "Add your feature"`
+4. Push the branch: `git push origin feature/your-feature`
+5. Open a pull request.
+
+## Authors
+
+Developed by **Ahmad**.
+
+
 
 Portions of this project are derived from [OSWA-INV](https://github.com/siamon123/warehouse-inventory-system), Copyright (c) 2015 Siamon Hasan, and are used under the [MIT License](https://github.com/siamon123/warehouse-inventory-system/blob/master/LICENSE).
