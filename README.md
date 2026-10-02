@@ -347,7 +347,7 @@ Contributions are welcome.
 
 ## Authors
 
-Developed by **Ahmad**.
+Developed by **Ahmad Ali**.
 
 
 
