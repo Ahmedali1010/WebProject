@@ -48,7 +48,7 @@ Save screenshots in docs/screenshots/, then uncomment this section and add "Scre
 | ![Dashboard](docs/screenshots/dashboard.png) | ![Products](docs/screenshots/products.png) | ![Sales report](docs/screenshots/sales-report.png) |
 -->
 
-## Features
+## Features The Project
 
 ### Dashboard
 
